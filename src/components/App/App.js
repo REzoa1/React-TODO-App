@@ -29,7 +29,7 @@ class App extends Component {
 
   onToggleComplete = (id) => {
     this.setState(({ tasksData }) => {
-      const idx = tasksData.findIndex((el) => el.id === id);
+      const idx = tasksData.findIndex((task) => task.id === id);
 
       const newTasks = [
         ...tasksData.slice(0, idx),
@@ -43,11 +43,14 @@ class App extends Component {
 
   onDeleteTask = (id) => {
     this.setState(({ tasksData }) => ({
-      tasksData: tasksData.filter((el) => el.id !== id),
+      tasksData: tasksData.filter((task) => task.id !== id),
     }));
   };
 
   render() {
+    const activeCount = this.state.tasksData.filter(
+      (task) => !task.isCompleted
+    ).length;
     return (
       <section className="todoapp">
         <header className="header">
@@ -64,7 +67,7 @@ class App extends Component {
             onToggleComplete={this.onToggleComplete}
             onDeleteTask={this.onDeleteTask}
           />
-          <Footer />
+          <Footer activeCount={activeCount} />
         </section>
       </section>
     );
