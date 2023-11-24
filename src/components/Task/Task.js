@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import "./Task.css";
 
-const Task = ({ name, completed }) => {
-  const [isChecked, setIsChecked] = useState(completed);
+const Task = ({ name, isCompleted, completeTask, deleteTask }) => {
+  const [isChecked, setIsChecked] = useState(isCompleted);
   const handleCheck = (e) => {
+    completeTask();
     setIsChecked(e.target.checked);
   };
 
@@ -20,7 +21,7 @@ const Task = ({ name, completed }) => {
         {/* <span className="created">created 17 seconds ago</span> */}
       </label>
       <button className="icon icon-edit" />
-      <button className="icon icon-destroy" />
+      <button className="icon icon-destroy" onClick={deleteTask} />
     </div>
   );
 };
