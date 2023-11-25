@@ -4,8 +4,8 @@ import NewTaskForm from "../NewTaskForm/NewTaskForm";
 import "./TaskList.css";
 // import { formatDistanceToNow } from "date-fns";
 
-const TaskList = ({ todos, onToggleComplete, onDeleteTask }) => {
-  const elements = todos.map(({ name, isCompleted, isEdited, id, created }) => {
+const TaskList = ({ tasks, onToggleComplete, onDeleteTask }) => {
+  const elements = tasks.map(({ name, isCompleted, isEdited, id, created }) => {
     const className = isEdited ? "editing" : isCompleted ? "completed" : null;
     return (
       <li key={id} className={className}>

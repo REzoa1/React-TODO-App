@@ -9,11 +9,9 @@ class App extends Component {
   constructor() {
     super();
     this.state = {
-      tasksData: [
-        this.createTask("Completed task"),
-        this.createTask("Editing task"),
-        this.createTask("Active task"),
-      ],
+      tasksData: this.tasksInitial,
+      filteredData: null,
+      value: "",
     };
   }
 
@@ -27,6 +25,12 @@ class App extends Component {
     };
   };
 
+  tasksInitial = [
+    this.createTask("Completed task"),
+    this.createTask("Editing task"),
+    this.createTask("Active task"),
+  ];
+
   onToggleComplete = (id) => {
     this.setState(({ tasksData }) => {
       const idx = tasksData.findIndex((task) => task.id === id);
@@ -36,7 +40,6 @@ class App extends Component {
         { ...tasksData[idx], isCompleted: !tasksData[idx].isCompleted },
         ...tasksData.slice(idx + 1),
       ];
-
       return { tasksData: newTasks };
     });
   };
@@ -47,27 +50,72 @@ class App extends Component {
     }));
   };
 
+  onSubmit = (e) => {
+    e.preventDefault();
+    const newTask = this.createTask(this.state.value);
+    this.setState(({ tasksData }) => ({
+      tasksData: [newTask, ...tasksData],
+      value: "",
+    }));
+  };
+
+  onChange = (e) => {
+    this.setState({ value: e.target.value });
+  };
+
+  onTabSelected = (name) => {
+    if (name === "All") {
+      this.setState({ filteredData: null });
+    } else {
+      this.setState(({ tasksData }) => ({
+        filteredData: tasksData.filter(({ isCompleted }) =>
+          name === "Active" ? isCompleted === false : isCompleted === true
+        ),
+      }));
+    }
+  };
+
+  clearCompleted = () => {
+    this.setState(({ tasksData }) => ({
+      tasksData: tasksData.filter(({ isCompleted }) => !isCompleted),
+    }));
+  };
+
   render() {
+    const { tasksData, filteredData, value } = this.state;
     const activeCount = this.state.tasksData.filter(
       (task) => !task.isCompleted
     ).length;
+
     return (
       <section className="todoapp">
         <header className="header">
           <h1>todos</h1>
-          <input
-            className="new-todo"
-            placeholder="What needs to be done?"
-            autoFocus=""
-          />
+          <form onSubmit={this.onSubmit}>
+            <input
+              className="new-todo"
+              placeholder="What needs to be done?"
+              autoFocus
+              value={value}
+              onChange={this.onChange}
+            />
+          </form>
         </header>
         <section className="main">
-          <TaskList
-            todos={this.state.tasksData}
-            onToggleComplete={this.onToggleComplete}
-            onDeleteTask={this.onDeleteTask}
+          {filteredData?.length === 0 ? (
+            <>No data</>
+          ) : (
+            <TaskList
+              tasks={filteredData ? filteredData : tasksData}
+              onToggleComplete={this.onToggleComplete}
+              onDeleteTask={this.onDeleteTask}
+            />
+          )}
+          <Footer
+            activeCount={activeCount}
+            onTabSelected={this.onTabSelected}
+            clearCompleted={this.clearCompleted}
           />
-          <Footer activeCount={activeCount} />
         </section>
       </section>
     );
