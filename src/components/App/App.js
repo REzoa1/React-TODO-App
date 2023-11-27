@@ -11,6 +11,7 @@ class App extends Component {
     this.state = {
       tasksData: this.tasksInitial,
       filteredData: null,
+      filterName: "All",
       value: "",
     };
   }
@@ -32,6 +33,8 @@ class App extends Component {
   ];
 
   onToggleComplete = (id) => {
+    const { filterName, filteredData } = this.state;
+
     this.setState(({ tasksData }) => {
       const idx = tasksData.findIndex((task) => task.id === id);
 
@@ -40,11 +43,25 @@ class App extends Component {
         { ...tasksData[idx], isCompleted: !tasksData[idx].isCompleted },
         ...tasksData.slice(idx + 1),
       ];
-      return { tasksData: newTasks };
+      const newFilteredData = newTasks.filter(({ isCompleted }) =>
+        filterName === "Active" ? isCompleted === false : isCompleted === true
+      );
+
+      if (filteredData) {
+        return { tasksData: newTasks, filteredData: newFilteredData };
+      } else {
+        return { tasksData: newTasks };
+      }
     });
   };
 
   onDeleteTask = (id) => {
+    if (this.state.filteredData) {
+      this.setState(({ filteredData }) => ({
+        filteredData: filteredData.filter((task) => task.id !== id),
+      }));
+    }
+
     this.setState(({ tasksData }) => ({
       tasksData: tasksData.filter((task) => task.id !== id),
     }));
@@ -52,7 +69,15 @@ class App extends Component {
 
   onSubmit = (e) => {
     e.preventDefault();
+    const { filterName } = this.state;
+
     const newTask = this.createTask(this.state.value);
+    if (filterName === "Active") {
+      this.setState(({ tasksData }) => ({
+        filteredData: [newTask, ...tasksData],
+      }));
+    }
+
     this.setState(({ tasksData }) => ({
       tasksData: [newTask, ...tasksData],
       value: "",
@@ -64,18 +89,23 @@ class App extends Component {
   };
 
   onTabSelected = (name) => {
-    if (name === "All") {
-      this.setState({ filteredData: null });
-    } else {
-      this.setState(({ tasksData }) => ({
-        filteredData: tasksData.filter(({ isCompleted }) =>
-          name === "Active" ? isCompleted === false : isCompleted === true
-        ),
-      }));
-    }
+    this.setState(({ tasksData }) => ({
+      filterName: name,
+      filteredData:
+        name === "All"
+          ? null
+          : tasksData.filter(({ isCompleted }) =>
+              name === "Active" ? isCompleted === false : isCompleted === true
+            ),
+    }));
   };
 
   clearCompleted = () => {
+    const { filterName } = this.state;
+    if (filterName === "Completed") {
+      this.setState({ filteredData: [] });
+    }
+
     this.setState(({ tasksData }) => ({
       tasksData: tasksData.filter(({ isCompleted }) => !isCompleted),
     }));
@@ -86,6 +116,7 @@ class App extends Component {
     const activeCount = this.state.tasksData.filter(
       (task) => !task.isCompleted
     ).length;
+    const tasks = filteredData ? filteredData : tasksData;
 
     return (
       <section className="todoapp">
@@ -102,11 +133,11 @@ class App extends Component {
           </form>
         </header>
         <section className="main">
-          {filteredData?.length === 0 ? (
+          {filteredData?.data?.length === 0 ? (
             <>No data</>
           ) : (
             <TaskList
-              tasks={filteredData ? filteredData : tasksData}
+              tasks={tasks}
               onToggleComplete={this.onToggleComplete}
               onDeleteTask={this.onDeleteTask}
             />
