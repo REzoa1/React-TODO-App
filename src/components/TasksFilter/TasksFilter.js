@@ -1,31 +1,34 @@
-import React from "react";
-import "./TasksFilter.css";
+import React from 'react'
+import './TasksFilter.css'
 
-const TasksFilter = ({ onTabSelected }) => {
+function TasksFilter({ onTabSelected }) {
   const handleSelect = (e) => {
-    if (e.target.tagName === "BUTTON") {
-      let currEl = e.currentTarget.querySelector(".selected");
-      currEl.classList.remove("selected");
+    const currEl = document.querySelector('.selected')
+    currEl.classList.remove('selected')
 
-      const btn = e.target.closest("button");
-      btn.className = "selected";
-      onTabSelected(e.target.textContent);
-    }
-  };
+    e.currentTarget.classList.add('selected')
+    onTabSelected(e.currentTarget.textContent)
+  }
 
   return (
-    <ul className="filters" onClick={handleSelect}>
+    <ul className="filters">
       <li>
-        <button className="selected">All</button>
+        <button type="button" className="selected" onClick={handleSelect}>
+          All
+        </button>
       </li>
       <li>
-        <button>Active</button>
+        <button type="button" onClick={handleSelect}>
+          Active
+        </button>
       </li>
       <li>
-        <button>Completed</button>
+        <button type="button" onClick={handleSelect}>
+          Completed
+        </button>
       </li>
     </ul>
-  );
-};
+  )
+}
 
-export default TasksFilter;
+export default TasksFilter

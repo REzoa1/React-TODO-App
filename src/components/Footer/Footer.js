@@ -1,19 +1,28 @@
-import React from "react";
-import "./Footer.css";
-import TasksFilter from "../TasksFilter/TasksFilter";
+import React from 'react'
+import PropTypes from 'prop-types'
 
-const Footer = ({ activeCount, onTabSelected, clearCompleted }) => {
+import TasksFilter from '../TasksFilter/TasksFilter'
+import { taskTypes } from '../../utils/constants'
+import './Footer.css'
+
+function Footer({ tasksData, onTabSelected, clearCompleted }) {
+  const activeCount = tasksData.filter((task) => !task.isCompleted).length
+
   return (
     <footer className="footer">
-      <span className="todo-count">
-        {activeCount > 0 ? `${activeCount} items left` : "Done!"}
-      </span>
+      <span className="todo-count">{activeCount > 0 ? `${activeCount} items left` : 'Done!'}</span>
       <TasksFilter onTabSelected={onTabSelected} />
-      <button className="clear-completed" onClick={clearCompleted}>
+      <button className="clear-completed" type="button" onClick={clearCompleted}>
         Clear completed
       </button>
     </footer>
-  );
-};
+  )
+}
 
-export default Footer;
+Footer.propTypes = {
+  tasksData: PropTypes.arrayOf(taskTypes).isRequired,
+  onTabSelected: PropTypes.func.isRequired,
+  clearCompleted: PropTypes.func.isRequired,
+}
+
+export default Footer

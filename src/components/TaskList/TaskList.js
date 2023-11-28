@@ -1,37 +1,41 @@
-import React, { Component } from "react";
-import Task from "../Task/Task";
-import NewTaskForm from "../NewTaskForm/NewTaskForm";
-import "./TaskList.css";
+import React from 'react'
+import PropTypes from 'prop-types'
 
-class TaskList extends Component {
-  render() {
-    const { tasks, onToggleComplete, onDeleteTask } = this.props;
+import Task from '../Task/Task'
+import EditTaskForm from '../EditTaskForm/EditTaskForm'
+import { taskTypes } from '../../utils/constants'
+import { cn } from '../../utils/helpers'
+import './TaskList.css'
 
-    const elements = tasks.map(
-      ({ name, isCompleted, isEdited, id, created }) => {
-        const className = isEdited
-          ? "editing"
-          : isCompleted
-          ? "completed"
-          : null;
-        return (
-          <li key={id} className={className}>
-            <Task
-              name={name}
-              created={created}
-              isCompleted={isCompleted}
-              completeTask={() => onToggleComplete(id)}
-              deleteTask={() => onDeleteTask(id)}
-            />
+function TaskList({ tasks, onToggleComplete, onDeleteTask, onEditTask }) {
+  const elements = tasks.map(({ name, isCompleted, isEdited, id, created }) => {
+    const className = cn(isEdited && 'editing', isCompleted && 'completed')
 
-            {isEdited && <NewTaskForm name={name} />}
-          </li>
-        );
-      }
-    );
+    return (
+      <li key={id} className={className}>
+        <Task
+          id={id}
+          name={name}
+          created={created}
+          isCompleted={isCompleted}
+          completeTask={() => onToggleComplete(id)}
+          editTask={() => onEditTask(id)}
+          deleteTask={() => onDeleteTask(id)}
+        />
 
-    return <ul className="todo-list">{elements}</ul>;
-  }
+        {isEdited && <EditTaskForm id={id} name={name} onEditTask={onEditTask} />}
+      </li>
+    )
+  })
+
+  return <ul className="todo-list">{elements}</ul>
 }
 
-export default TaskList;
+TaskList.propTypes = {
+  tasks: PropTypes.arrayOf(taskTypes).isRequired,
+  onToggleComplete: PropTypes.func.isRequired,
+  onDeleteTask: PropTypes.func.isRequired,
+  onEditTask: PropTypes.func.isRequired,
+}
+
+export default TaskList
