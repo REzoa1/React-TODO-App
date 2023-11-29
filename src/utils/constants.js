@@ -32,4 +32,6 @@ const taskTypes = PropTypes.shape({
   created: PropTypes.instanceOf(Date),
 })
 
-export { TASKS_INITIAL, taskTypes }
+const FILTER_LIST = ['All', 'Active', 'Completed']
+
+export { TASKS_INITIAL, taskTypes, FILTER_LIST }

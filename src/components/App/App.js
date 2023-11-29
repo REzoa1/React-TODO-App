@@ -3,10 +3,8 @@ import React, { Component } from 'react'
 import NewTaskForm from '../NewTaskForm/NewTaskForm'
 import TaskList from '../TaskList/TaskList'
 import Footer from '../Footer/Footer'
-import { createTask, updData } from '../../utils/helpers'
+import { createTask, updateData } from '../../utils/helpers'
 import { TASKS_INITIAL } from '../../utils/constants'
-
-import { ReactComponent as NoDataLogo } from './noDataLogo.svg'
 import './App.css'
 
 class App extends Component {
@@ -14,23 +12,13 @@ class App extends Component {
     super()
     this.state = {
       tasksData: TASKS_INITIAL,
-      filteredData: null,
       filterName: 'All',
     }
   }
 
-  addTask = (newData) => {
-    const { filteredData, filterName } = this.state
-    const states = ['tasksData', filteredData && filterName === 'Active' && 'filteredData'].filter(Boolean)
-
-    this.setState((state) => {
-      const newStates = states.reduce((acc, stateName) => {
-        acc[stateName] = [newData, ...state[stateName]]
-        return acc
-      }, {})
-
-      return newStates
-    })
+  get activeTaskCount() {
+    const { tasksData } = this.state
+    return tasksData?.filter(({ isCompleted }) => !isCompleted).length
   }
 
   onAddTask = (name) => {
@@ -40,58 +28,30 @@ class App extends Component {
     }
 
     const newTask = createTask(taskName)
-    this.addTask(newTask)
-  }
-
-  removeTask = (id) => {
-    const { filteredData } = this.state
-    const states = ['tasksData', filteredData && 'filteredData'].filter(Boolean)
-
-    this.setState((state) => {
-      const newStates = states.reduce((acc, stateName) => {
-        acc[stateName] = state[stateName].filter((task) => task.id !== id)
-        return acc
-      }, {})
-
-      return newStates
-    })
+    this.setState(({ tasksData }) => ({
+      tasksData: [newTask, ...tasksData],
+    }))
   }
 
   onDeleteTask = (id) => {
-    this.removeTask(id)
+    this.setState(({ tasksData }) => ({
+      tasksData: tasksData.filter((task) => task.id !== id),
+    }))
   }
 
   updateTask = (id, props) => {
-    const { filteredData } = this.state
-    const states = ['tasksData', filteredData && 'filteredData'].filter(Boolean)
+    this.setState(({ tasksData }) => {
+      const idx = tasksData.findIndex((task) => task.id === id)
 
-    this.setState((state) => {
-      const newStates = states.reduce((acc, stateName) => {
-        const data = state[stateName]
-        const idx = data.findIndex((task) => task.id === id)
+      const newTask = updateData(tasksData[idx], props)
+      const newData = [...tasksData.slice(0, idx), newTask, ...tasksData.slice(idx + 1)]
 
-        const newTask = updData(data, idx, props)
-        const newData = [...data.slice(0, idx), newTask, ...data.slice(idx + 1)]
-
-        acc[stateName] = newData
-        return acc
-      }, {})
-
-      return newStates
+      return { tasksData: newData }
     })
   }
 
   onToggleComplete = (id) => {
     this.updateTask(id, ['isCompleted'])
-
-    // eslint-disable-next-line react/destructuring-assignment
-    if (this.state.filteredData) {
-      this.setState(({ filteredData, filterName }) => ({
-        filteredData: filteredData.filter(({ isCompleted }) =>
-          filterName === 'Completed' ? isCompleted : !isCompleted
-        ),
-      }))
-    }
   }
 
   onEditTask = (id, newName) => {
@@ -104,44 +64,17 @@ class App extends Component {
       return
     }
 
-    this.setState(({ tasksData }) => ({
-      filterName: name,
-      filteredData:
-        name === 'All'
-          ? null
-          : tasksData.filter(({ isCompleted }) => (name === 'Completed' ? isCompleted : !isCompleted)),
-    }))
+    this.setState({ filterName: name })
   }
 
   clearCompleted = () => {
-    const { filterName } = this.state
-    if (filterName === 'Completed') {
-      this.setState({ filteredData: [] })
-    }
-
     this.setState(({ tasksData }) => ({
       tasksData: tasksData.filter(({ isCompleted }) => !isCompleted),
     }))
   }
 
   render() {
-    const { tasksData, filteredData } = this.state
-    const tasks = filteredData || tasksData
-
-    const isDataEmpty = filteredData?.length === 0 || tasksData?.length === 0
-    const main = isDataEmpty ? (
-      <div className="no-data">
-        <NoDataLogo />
-        No data
-      </div>
-    ) : (
-      <TaskList
-        tasks={tasks}
-        onToggleComplete={this.onToggleComplete}
-        onDeleteTask={this.onDeleteTask}
-        onEditTask={this.onEditTask}
-      />
-    )
+    const { tasksData, filterName } = this.state
 
     return (
       <section className="todoapp">
@@ -150,8 +83,18 @@ class App extends Component {
           <NewTaskForm onAddTask={this.onAddTask} />
         </header>
         <section className="main">
-          {main}
-          <Footer tasksData={tasksData} onTabSelected={this.onTabSelected} clearCompleted={this.clearCompleted} />
+          <TaskList
+            tasksData={tasksData}
+            filterName={filterName}
+            onToggleComplete={this.onToggleComplete}
+            onDeleteTask={this.onDeleteTask}
+            onEditTask={this.onEditTask}
+          />
+          <Footer
+            activeTaskCount={this.activeTaskCount}
+            onTabSelected={this.onTabSelected}
+            clearCompleted={this.clearCompleted}
+          />
         </section>
       </section>
     )

@@ -1,13 +1,5 @@
 import { TASKS_INITIAL } from './constants'
 
-const updateData = (dataName, newData) => {
-  this.setState((prev) => {
-    return {
-      [dataName]: [newData, ...prev[dataName]],
-    }
-  })
-}
-
 let count = TASKS_INITIAL.length
 
 const createTask = (name) => {
@@ -22,20 +14,20 @@ const createTask = (name) => {
   }
 }
 
-const updData = (data, idx, props) => {
+const updateData = (currEl, props) => {
   const newProps = props.reduce((acc, currProp) => {
     if (Array.isArray(currProp)) {
       const [key, value] = currProp
-      acc[key] = value || data[idx][key]
+      acc[key] = value || currEl[key]
     } else {
-      acc[currProp] = !data[idx][currProp]
+      acc[currProp] = !currEl[currProp]
     }
     return acc
   }, {})
 
-  return { ...data[idx], ...newProps }
+  return { ...currEl, ...newProps }
 }
 
 const cn = (...classes) => [...classes].filter(Boolean).join(' ')
 
-export { updateData, cn, createTask, updData }
+export { createTask, updateData, cn }

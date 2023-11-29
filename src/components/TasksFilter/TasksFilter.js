@@ -1,8 +1,13 @@
-import React from 'react'
-import './TasksFilter.css'
+import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 
-function TasksFilter({ onTabSelected }) {
-  const handleSelect = (e) => {
+import './TasksFilter.css'
+import { cn } from '../../utils/helpers'
+import { FILTER_LIST } from '../../utils/constants'
+
+class TasksFilter extends Component {
+  handleSelect = (e) => {
+    const { onTabSelected } = this.props
     const currEl = document.querySelector('.selected')
     currEl.classList.remove('selected')
 
@@ -10,25 +15,24 @@ function TasksFilter({ onTabSelected }) {
     onTabSelected(e.currentTarget.textContent)
   }
 
-  return (
-    <ul className="filters">
-      <li>
-        <button type="button" className="selected" onClick={handleSelect}>
-          All
-        </button>
-      </li>
-      <li>
-        <button type="button" onClick={handleSelect}>
-          Active
-        </button>
-      </li>
-      <li>
-        <button type="button" onClick={handleSelect}>
-          Completed
-        </button>
-      </li>
-    </ul>
-  )
+  render() {
+    const filters = FILTER_LIST.map((item, i) => {
+      const className = cn(i === 0 && 'selected')
+      return (
+        <li key={`${item}-filter`}>
+          <button type="button" className={className} onClick={this.handleSelect}>
+            {item}
+          </button>
+        </li>
+      )
+    })
+
+    return <ul className="filters">{filters}</ul>
+  }
+}
+
+TasksFilter.propTypes = {
+  onTabSelected: PropTypes.func.isRequired,
 }
 
 export default TasksFilter
