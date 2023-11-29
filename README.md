@@ -1,5 +1,5 @@
 # TODO APP
 
-### Github-pages:
+### Vercel:
 
 #### <code>https://kata-todo-beta.vercel.app/</code>
