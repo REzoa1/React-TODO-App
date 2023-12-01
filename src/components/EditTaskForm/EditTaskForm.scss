@@ -1,0 +1,5 @@
+@import './../../scss/extends.scss';
+
+.edit {
+  @extend %input-form;
+}

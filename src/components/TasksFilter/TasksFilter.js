@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 
-import './TasksFilter.css'
 import { cn } from '../../utils/helpers'
 import { FILTER_LIST } from '../../utils/constants'
+import './TasksFilter.scss'
 
 class TasksFilter extends Component {
   handleSelect = (e) => {

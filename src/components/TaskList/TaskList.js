@@ -7,7 +7,7 @@ import { taskTypes } from '../../utils/constants'
 import { cn } from '../../utils/helpers'
 
 import { ReactComponent as NoDataLogo } from './noDataLogo.svg'
-import './TaskList.css'
+import './TaskList.scss'
 
 function TaskList({ tasksData, filterName, onToggleComplete, onDeleteTask, onEditTask }) {
   const callback = ({ isCompleted }) => (filterName === 'Completed' ? isCompleted : !isCompleted)

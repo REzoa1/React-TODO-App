@@ -5,7 +5,7 @@ import TaskList from '../TaskList/TaskList'
 import Footer from '../Footer/Footer'
 import { createTask, updateData } from '../../utils/helpers'
 import { TASKS_INITIAL } from '../../utils/constants'
-import './App.css'
+import './App.scss'
 
 class App extends Component {
   constructor() {
