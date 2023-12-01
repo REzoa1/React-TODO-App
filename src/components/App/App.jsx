@@ -40,11 +40,9 @@ class App extends Component {
   }
 
   updateTask = (id, props) => {
-    this.setState(({ tasksData }) => {
-      const newData = tasksData.map((task) => (task.id === id ? updateData(task, props) : task))
-
-      return { tasksData: newData }
-    })
+    this.setState(({ tasksData }) => ({
+      tasksData: tasksData.map((task) => (task.id === id ? updateData(task, props) : task)),
+    }))
   }
 
   onToggleComplete = (id) => {
