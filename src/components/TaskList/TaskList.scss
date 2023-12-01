@@ -127,6 +127,10 @@
         &:after {
           content: '✎';
         }
+
+        &.disable {
+          color: #b3b3b3;
+        }
       }
     }
 

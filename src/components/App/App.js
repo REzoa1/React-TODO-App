@@ -41,10 +41,7 @@ class App extends Component {
 
   updateTask = (id, props) => {
     this.setState(({ tasksData }) => {
-      const idx = tasksData.findIndex((task) => task.id === id)
-
-      const newTask = updateData(tasksData[idx], props)
-      const newData = [...tasksData.slice(0, idx), newTask, ...tasksData.slice(idx + 1)]
+      const newData = tasksData.map((task) => (task.id === id ? updateData(task, props) : task))
 
       return { tasksData: newData }
     })

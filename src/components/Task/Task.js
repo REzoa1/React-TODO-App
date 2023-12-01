@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { formatDistanceToNow } from 'date-fns'
 
+import { cn } from '../../utils/helpers'
+
 class Task extends Component {
   constructor(props) {
     super(props)
@@ -29,8 +31,10 @@ class Task extends Component {
   }
 
   editTask = () => {
-    const { onEditTask, id } = this.props
-    onEditTask(id)
+    const { onEditTask, isCompleted, id } = this.props
+    if (!isCompleted) {
+      onEditTask(id)
+    }
   }
 
   deleteTask = () => {
@@ -41,6 +45,7 @@ class Task extends Component {
   render() {
     const { id, name, isCompleted } = this.props
     const { formattedTime } = this.state
+    const editClassName = cn('icon', 'icon-edit', isCompleted && 'disable')
 
     return (
       <div className="view">
@@ -49,7 +54,7 @@ class Task extends Component {
           <span className="description">{name}</span>
           <span className="created">created {formattedTime} ago</span>
         </label>
-        <button aria-label="Edit" type="button" className="icon icon-edit" onClick={this.editTask} />
+        <button aria-label="Edit" type="button" className={editClassName} onClick={this.editTask} />
         <button aria-label="Delete" type="button" className="icon icon-destroy" onClick={this.deleteTask} />
       </div>
     )
