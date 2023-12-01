@@ -1,20 +1,15 @@
-import React, { Component } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import './EditTaskForm.scss'
 
-class EditTaskForm extends Component {
-  onKeyDown = (e) => {
-    const { onEditTask, id } = this.props
+function EditTaskForm({ id, name, onEditTask }) {
+  const onKeyDown = (e) => {
     if (e.key === 'Enter') {
       onEditTask(id, e.target.value)
     }
   }
 
-  render() {
-    const { name } = this.props
-
-    return <input type="text" className="edit" defaultValue={name} onKeyDown={this.onKeyDown} />
-  }
+  return <input type="text" className="edit" defaultValue={name} onKeyDown={onKeyDown} />
 }
 
 EditTaskForm.propTypes = {
