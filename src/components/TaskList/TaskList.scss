@@ -44,18 +44,24 @@
       justify-content: space-between;
       padding: 15px 85px 15px 60px;
 
-      & .created {
-        font-size: 13px;
-        color: gray;
-      }
-
-      & .description {
+      & .title {
         word-break: break-all;
         display: block;
         line-height: 1.2;
         transition: color 0.4s;
         font-weight: 400;
         color: #4d4d4d;
+      }
+
+      & .created {
+        font-size: 13px;
+        color: gray;
+      }
+
+      & .description {
+        font-size: 13px;
+        color: gray;
+        min-width: 50px;
       }
     }
 
@@ -91,9 +97,11 @@
       }
     }
 
-    &.completed label .description {
-      color: #cdcdcd;
-      text-decoration: line-through;
+    &.completed label {
+      & .title {
+        color: #cdcdcd;
+        text-decoration: line-through;
+      }
     }
 
     & .icon {
@@ -129,6 +137,41 @@
         }
 
         &.disable {
+          color: #b3b3b3;
+        }
+      }
+
+      &-play {
+        position: relative;
+        margin: 0;
+        font-size: 15px;
+        width: 18px;
+        height: 18px;
+
+        &:after {
+          content: '▶';
+        }
+
+        &.disable {
+          color: #b3b3b3;
+        }
+      }
+
+      &-pause {
+        position: relative;
+        margin: 0;
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+
+        margin-right: 10px;
+
+        &:after {
+          content: '⏸';
+        }
+
+        &.disable {
+          filter: grayscale(100%);
           color: #b3b3b3;
         }
       }

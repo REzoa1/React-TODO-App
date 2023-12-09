@@ -9,7 +9,7 @@ import { cn } from '../../utils/helpers'
 import { ReactComponent as NoDataLogo } from './noDataLogo.svg'
 import './TaskList.scss'
 
-function TaskList({ tasksData, filterName, onToggleComplete, onDeleteTask, onEditTask }) {
+function TaskList({ tasksData, filterName, onToggleComplete, onDeleteTask, onEditTask, onSecondsSet }) {
   const callback = ({ isCompleted }) => (filterName === 'Completed' ? isCompleted : !isCompleted)
   const tasks = filterName === 'All' ? tasksData : tasksData.filter(callback)
 
@@ -20,7 +20,7 @@ function TaskList({ tasksData, filterName, onToggleComplete, onDeleteTask, onEdi
     </div>
   )
 
-  const elements = tasks.map(({ name, isCompleted, isEdited, id, created }) => {
+  const elements = tasks.map(({ name, isCompleted, isEdited, id, created, seconds }) => {
     const className = cn(isEdited && 'editing', isCompleted && 'completed')
     return (
       <li key={id} className={className}>
@@ -28,10 +28,12 @@ function TaskList({ tasksData, filterName, onToggleComplete, onDeleteTask, onEdi
           id={id}
           name={name}
           created={created}
+          seconds={seconds}
           isCompleted={isCompleted}
           onToggleComplete={onToggleComplete}
           onEditTask={onEditTask}
           onDeleteTask={onDeleteTask}
+          onSecondsSet={onSecondsSet}
         />
 
         {isEdited && <EditTaskForm id={id} name={name} onEditTask={onEditTask} />}
@@ -48,6 +50,7 @@ TaskList.propTypes = {
   onToggleComplete: PropTypes.func.isRequired,
   onDeleteTask: PropTypes.func.isRequired,
   onEditTask: PropTypes.func.isRequired,
+  onSecondsSet: PropTypes.func.isRequired,
 }
 
 TaskList.defaultProps = {

@@ -53,6 +53,10 @@ class App extends Component {
     this.updateTask(id, [['name', newName], 'isEdited'])
   }
 
+  onSecondsSet = (id, seconds) => {
+    this.updateTask(id, [['seconds', seconds]])
+  }
+
   onTabSelected = (name) => {
     const { filterName } = this.state
     if (name === filterName) {
@@ -70,6 +74,7 @@ class App extends Component {
 
   render() {
     const { tasksData, filterName } = this.state
+    // console.log(tasksData)
 
     return (
       <section className="todoapp">
@@ -84,6 +89,7 @@ class App extends Component {
             onToggleComplete={this.onToggleComplete}
             onDeleteTask={this.onDeleteTask}
             onEditTask={this.onEditTask}
+            onSecondsSet={this.onSecondsSet}
           />
           <Footer
             activeTaskCount={this.activeTaskCount}
