@@ -8,8 +8,26 @@ class Timer extends Component {
     this.state = { seconds: props.seconds }
   }
 
+  componentDidMount() {
+    const { isPaused, isCompleted } = this.props
+
+    if (isPaused || isCompleted) {
+      clearInterval(this.interval)
+    } else {
+      this.interval = setInterval(() => {
+        this.setState((state) => ({
+          seconds: state.seconds + 1,
+        }))
+      }, 1000)
+    }
+  }
+
   componentDidUpdate(prevProps) {
-    const { isPaused } = this.props
+    const { isPaused, intervalId } = this.props
+
+    if (intervalId) {
+      clearInterval(intervalId)
+    }
 
     if (isPaused) {
       clearInterval(this.interval)
@@ -26,10 +44,21 @@ class Timer extends Component {
   }
 
   componentWillUnmount() {
-    const { onSecondsSet, id } = this.props
+    const { id, isPaused, onSecondsSet, intervalId } = this.props
     const { seconds } = this.state
-    onSecondsSet(id, seconds)
+    clearInterval(intervalId)
     clearInterval(this.interval)
+
+    if (!isPaused) {
+      let s = seconds
+      this.interval = setInterval(() => {
+        s += 1
+        onSecondsSet(id, s, this.interval)
+      }, 1000)
+      onSecondsSet(id, s, this.interval)
+    } else {
+      onSecondsSet(id, seconds)
+    }
   }
 
   render() {
@@ -44,7 +73,16 @@ class Timer extends Component {
 }
 
 Timer.propTypes = {
+  id: PropTypes.number.isRequired,
+  seconds: PropTypes.number.isRequired,
+  intervalId: PropTypes.number,
+  isCompleted: PropTypes.bool.isRequired,
   isPaused: PropTypes.bool.isRequired,
+  onSecondsSet: PropTypes.func.isRequired,
+}
+
+Timer.defaultProps = {
+  intervalId: null,
 }
 
 export default Timer

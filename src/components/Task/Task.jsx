@@ -10,7 +10,7 @@ class Task extends Component {
     super(props)
     this.state = {
       formattedTime: formatDistanceToNow(props.created),
-      isPaused: true,
+      isPaused: props.seconds ? props.intervalId === null : true,
     }
   }
 
@@ -62,7 +62,7 @@ class Task extends Component {
   }
 
   render() {
-    const { id, name, seconds, isCompleted, onSecondsSet } = this.props
+    const { id, name, isCompleted, onSecondsSet, intervalId, seconds } = this.props
     const { formattedTime, isPaused } = this.state
     const className = cn('icon', isCompleted && 'disable')
 
@@ -74,7 +74,15 @@ class Task extends Component {
           <span className="description">
             <button aria-label="Play" type="button" className={`${className} icon-play`} onClick={this.onPlay} />
             <button aria-label="Pause" type="button" className={`${className} icon-pause`} onClick={this.onPause} />
-            <Timer isPaused={isPaused} id={id} seconds={seconds} onSecondsSet={onSecondsSet} />
+
+            <Timer
+              id={id}
+              seconds={seconds}
+              intervalId={intervalId}
+              isPaused={isPaused}
+              isCompleted={isCompleted}
+              onSecondsSet={onSecondsSet}
+            />
           </span>
           <span className="description">created {formattedTime} ago</span>
         </label>
@@ -88,7 +96,9 @@ class Task extends Component {
 Task.propTypes = {
   id: PropTypes.number.isRequired,
   name: PropTypes.string.isRequired,
+  created: PropTypes.instanceOf(Date).isRequired,
   seconds: PropTypes.number,
+  intervalId: PropTypes.number,
   isCompleted: PropTypes.bool,
   onToggleComplete: PropTypes.func.isRequired,
   onEditTask: PropTypes.func.isRequired,
@@ -99,6 +109,7 @@ Task.propTypes = {
 Task.defaultProps = {
   isCompleted: false,
   seconds: 0,
+  intervalId: null,
 }
 
 export default Task

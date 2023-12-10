@@ -39,9 +39,9 @@ class App extends Component {
     }))
   }
 
-  updateTask = (id, props) => {
+  updateTask = (id, props, actionType) => {
     this.setState(({ tasksData }) => ({
-      tasksData: tasksData.map((task) => (task.id === id ? updateData(task, props) : task)),
+      tasksData: tasksData.map((task) => (task.id === id ? updateData(task, props, actionType) : task)),
     }))
   }
 
@@ -50,11 +50,14 @@ class App extends Component {
   }
 
   onEditTask = (id, newName) => {
-    this.updateTask(id, [['name', newName], 'isEdited'])
+    this.updateTask(id, [['name', newName], 'isEdited'], 'edit')
   }
 
-  onSecondsSet = (id, seconds) => {
-    this.updateTask(id, [['seconds', seconds]])
+  onSecondsSet = (id, seconds, intervalId = null) => {
+    this.updateTask(id, [
+      ['seconds', seconds],
+      ['intervalId', intervalId],
+    ])
   }
 
   onTabSelected = (name) => {
@@ -74,7 +77,6 @@ class App extends Component {
 
   render() {
     const { tasksData, filterName } = this.state
-    // console.log(tasksData)
 
     return (
       <section className="todoapp">

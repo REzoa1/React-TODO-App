@@ -20,7 +20,7 @@ function TaskList({ tasksData, filterName, onToggleComplete, onDeleteTask, onEdi
     </div>
   )
 
-  const elements = tasks.map(({ name, isCompleted, isEdited, id, created, seconds }) => {
+  const elements = tasks.map(({ name, isCompleted, isEdited, id, created, seconds, intervalId }) => {
     const className = cn(isEdited && 'editing', isCompleted && 'completed')
     return (
       <li key={id} className={className}>
@@ -29,6 +29,7 @@ function TaskList({ tasksData, filterName, onToggleComplete, onDeleteTask, onEdi
           name={name}
           created={created}
           seconds={seconds}
+          intervalId={intervalId}
           isCompleted={isCompleted}
           onToggleComplete={onToggleComplete}
           onEditTask={onEditTask}

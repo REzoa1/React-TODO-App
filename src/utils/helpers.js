@@ -14,11 +14,19 @@ const createTask = (name) => {
   }
 }
 
-const updateData = (currEl, props) => {
+const updateData = (currEl, props, actionType) => {
   const newProps = props.reduce((acc, currProp) => {
     if (Array.isArray(currProp)) {
       const [key, value] = currProp
-      acc[key] = value || currEl[key]
+      switch (actionType) {
+        case 'edit': {
+          acc[key] = value || currEl[key]
+          break
+        }
+        default: {
+          acc[key] = value
+        }
+      }
     } else {
       acc[currProp] = !currEl[currProp]
     }
