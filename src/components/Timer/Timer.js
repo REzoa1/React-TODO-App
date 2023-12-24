@@ -1,80 +1,68 @@
+import { useEffect, useState, useRef } from 'react'
 import { intervalToDuration } from 'date-fns'
 import PropTypes from 'prop-types'
-import { Component } from 'react'
 
-class Timer extends Component {
-  constructor(props) {
-    super(props)
-    this.state = { seconds: props.seconds }
-  }
+function Timer({ id, initialSeconds, intervalId, isCompleted, isPaused, onSecondsSet }) {
+  const [seconds, setSeconds] = useState(initialSeconds)
+  const currIntervalId = useRef()
 
-  componentDidMount() {
-    const { isPaused, isCompleted } = this.props
+  const shouldTimerUpdate = !isPaused && !isCompleted
+  const shouldTimerClear = isPaused || isCompleted
 
-    if (isPaused || isCompleted) {
-      clearInterval(this.interval)
-    } else {
-      this.interval = setInterval(() => {
-        this.setState((state) => ({
-          seconds: state.seconds + 1,
-        }))
+  useEffect(() => {
+    const interval =
+      shouldTimerUpdate &&
+      setInterval(() => {
+        setSeconds((prev) => prev + 1)
       }, 1000)
-    }
-  }
 
-  componentDidUpdate(prevProps) {
-    const { isPaused, intervalId } = this.props
+    currIntervalId.current = interval || null
 
     if (intervalId) {
       clearInterval(intervalId)
     }
 
-    if (isPaused) {
-      clearInterval(this.interval)
-      return
+    if (shouldTimerClear) {
+      clearInterval(interval)
     }
 
-    if (prevProps.isPaused !== isPaused) {
-      this.interval = setInterval(() => {
-        this.setState((state) => ({
-          seconds: state.seconds + 1,
-        }))
-      }, 1000)
+    return () => {
+      clearInterval(intervalId)
+      clearInterval(interval)
+      currIntervalId.current = null
     }
-  }
+  }, [intervalId, shouldTimerUpdate, shouldTimerClear])
 
-  componentWillUnmount() {
-    const { id, isPaused, onSecondsSet, intervalId } = this.props
-    const { seconds } = this.state
-    clearInterval(intervalId)
-    clearInterval(this.interval)
-
-    if (!isPaused) {
+  useEffect(() => {
+    return () => {
       let s = seconds
-      this.interval = setInterval(() => {
-        s += 1
-        onSecondsSet(id, s, this.interval)
-      }, 1000)
-      onSecondsSet(id, s, this.interval)
-    } else {
-      onSecondsSet(id, seconds)
+
+      if (shouldTimerClear) {
+        onSecondsSet(id, s)
+      }
+      if (shouldTimerUpdate && currIntervalId.current === null) {
+        const newInterval = setInterval(() => {
+          s += 1
+          onSecondsSet(id, s, newInterval)
+        }, 1000)
+        onSecondsSet(id, s, newInterval)
+        currIntervalId.current = newInterval
+      }
     }
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, seconds, shouldTimerUpdate, shouldTimerClear, currIntervalId])
 
-  render() {
-    const { seconds } = this.state
-    const zeros = (num) => (num < 10 ? `0${num}` : num)
+  const zeros = (num) => (num < 10 ? `0${num}` : num)
 
-    const duration = intervalToDuration({ start: 0, end: seconds * 1000 })
-    const formatted = `${zeros(duration.minutes)}:${zeros(duration.seconds)}`
+  const duration = intervalToDuration({ start: 0, end: seconds * 1000 })
+  const formatted = `${zeros(duration.minutes)}:${zeros(duration.seconds)}`
 
-    return formatted
-  }
+  return formatted
 }
 
 Timer.propTypes = {
   id: PropTypes.number.isRequired,
-  seconds: PropTypes.number.isRequired,
+  initialSeconds: PropTypes.number.isRequired,
   intervalId: PropTypes.number,
   isCompleted: PropTypes.bool.isRequired,
   isPaused: PropTypes.bool.isRequired,

@@ -1,96 +1,91 @@
-import React, { Component } from 'react'
+import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import { formatDistanceToNow } from 'date-fns'
 
 import { cn } from '../../utils/helpers'
 import Timer from '../Timer/Timer'
 
-class Task extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      formattedTime: formatDistanceToNow(props.created),
-      isPaused: props.seconds ? props.intervalId === null : true,
+function Task({
+  id,
+  name,
+  created,
+  seconds,
+  intervalId,
+  isCompleted,
+  onToggleComplete,
+  onEditTask,
+  onDeleteTask,
+  onSecondsSet,
+}) {
+  const initialTime = formatDistanceToNow(created)
+  const hasTimer = seconds !== undefined ? intervalId === null : true
+
+  const [time, setTime] = useState(initialTime)
+  const [isPaused, setIsPaused] = useState(hasTimer)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const formattedTime = formatDistanceToNow(created)
+      setTime(formattedTime)
+    }, 60 * 1000)
+
+    return () => clearInterval(interval)
+  }, [created])
+
+  const onPlay = () => {
+    if (!isCompleted && isPaused) {
+      setIsPaused(false)
     }
   }
 
-  componentDidMount() {
-    const { created } = this.props
-    this.interval = setInterval(() => {
-      const formattedTime = formatDistanceToNow(created)
-
-      this.setState({ formattedTime })
-    }, 60 * 1000)
+  const onPause = () => {
+    if (!isPaused) {
+      setIsPaused(true)
+    }
   }
 
-  componentWillUnmount() {
-    clearInterval(this.interval)
-  }
-
-  completeTask = () => {
-    const { onToggleComplete, id } = this.props
+  const completeTask = () => {
     onToggleComplete(id)
-    this.onPause()
+    setIsPaused(true)
   }
 
-  editTask = () => {
-    const { onEditTask, isCompleted, id } = this.props
+  const editTask = () => {
     if (!isCompleted) {
       onEditTask(id)
     }
   }
 
-  deleteTask = () => {
-    const { onDeleteTask, id } = this.props
+  const deleteTask = () => {
     onDeleteTask(id)
   }
 
-  onPlay = () => {
-    const { isCompleted } = this.props
-    const { isPaused } = this.state
+  const className = cn('icon', isCompleted && 'disable')
 
-    if (!isCompleted && isPaused) {
-      this.setState({ isPaused: false })
-    }
-  }
+  return (
+    <div className="view">
+      <input type="checkbox" className="toggle" id={id} onChange={completeTask} checked={isCompleted} />
+      <label htmlFor={id}>
+        <span className="title">{name}</span>
+        <span className="description">
+          <button aria-label="Play" type="button" className={`${className} icon-play`} onClick={onPlay} />
+          <button aria-label="Pause" type="button" className={`${className} icon-pause`} onClick={onPause} />
 
-  onPause = () => {
-    const { isPaused } = this.state
-    if (!isPaused) {
-      this.setState({ isPaused: true })
-    }
-  }
-
-  render() {
-    const { id, name, isCompleted, onSecondsSet, intervalId, seconds } = this.props
-    const { formattedTime, isPaused } = this.state
-    const className = cn('icon', isCompleted && 'disable')
-
-    return (
-      <div className="view">
-        <input type="checkbox" className="toggle" id={id} onChange={this.completeTask} checked={isCompleted} />
-        <label htmlFor={id}>
-          <span className="title">{name}</span>
-          <span className="description">
-            <button aria-label="Play" type="button" className={`${className} icon-play`} onClick={this.onPlay} />
-            <button aria-label="Pause" type="button" className={`${className} icon-pause`} onClick={this.onPause} />
-
-            <Timer
-              id={id}
-              seconds={seconds}
-              intervalId={intervalId}
-              isPaused={isPaused}
-              isCompleted={isCompleted}
-              onSecondsSet={onSecondsSet}
-            />
-          </span>
-          <span className="description">created {formattedTime} ago</span>
-        </label>
-        <button aria-label="Edit" type="button" className={`${className} icon-edit`} onClick={this.editTask} />
-        <button aria-label="Delete" type="button" className="icon icon-destroy" onClick={this.deleteTask} />
-      </div>
-    )
-  }
+          <Timer
+            id={id}
+            initialSeconds={seconds}
+            intervalId={intervalId}
+            isPaused={isPaused}
+            isCompleted={isCompleted}
+            onSecondsSet={onSecondsSet}
+            onDeleteTask={onDeleteTask}
+          />
+        </span>
+        <span className="description">created {time} ago</span>
+      </label>
+      <button aria-label="Edit" type="button" className={`${className} icon-edit`} onClick={editTask} />
+      <button aria-label="Delete" type="button" className="icon icon-destroy" onClick={deleteTask} />
+    </div>
+  )
 }
 
 Task.propTypes = {

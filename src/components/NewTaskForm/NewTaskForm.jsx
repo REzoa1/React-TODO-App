@@ -1,44 +1,26 @@
-import React, { Component } from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import './NewTaskForm.scss'
 
-class NewTaskForm extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      inputVal: '',
-    }
-  }
+function NewTaskForm({ onAddTask }) {
+  const [value, setValue] = useState('')
 
-  onSubmit = (e) => {
+  const onSubmit = (e) => {
     e.preventDefault()
-    const { inputVal } = this.state
-    const { onAddTask } = this.props
 
-    onAddTask(inputVal)
-
-    this.setState({ inputVal: '' })
+    onAddTask(value)
+    setValue('')
   }
 
-  onChange = (e) => {
-    this.setState({ inputVal: e.target.value })
+  const onChange = (e) => {
+    setValue(e.target.value)
   }
 
-  render() {
-    const { inputVal } = this.state
-
-    return (
-      <form onSubmit={this.onSubmit}>
-        <input
-          className="new-todo"
-          placeholder="What needs to be done?"
-          value={inputVal}
-          onChange={this.onChange}
-          required
-        />
-      </form>
-    )
-  }
+  return (
+    <form onSubmit={onSubmit}>
+      <input className="new-todo" placeholder="What needs to be done?" value={value} onChange={onChange} required />
+    </form>
+  )
 }
 
 NewTaskForm.propTypes = {
