@@ -2,10 +2,10 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import './EditTaskForm.scss'
 
-function EditTaskForm({ id, name, onEditTask }) {
+function EditTaskForm({ name, onEditTask }) {
   const onKeyDown = (e) => {
     if (e.key === 'Enter') {
-      onEditTask(id, e.target.value)
+      onEditTask(e.target.value)
     }
   }
 
@@ -13,7 +13,6 @@ function EditTaskForm({ id, name, onEditTask }) {
 }
 
 EditTaskForm.propTypes = {
-  id: PropTypes.number.isRequired,
   name: PropTypes.string.isRequired,
   onEditTask: PropTypes.func.isRequired,
 }

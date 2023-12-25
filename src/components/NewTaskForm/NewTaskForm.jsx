@@ -1,9 +1,21 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
+
+import { createTask } from '../../utils/helpers'
 import './NewTaskForm.scss'
 
-function NewTaskForm({ onAddTask }) {
+function NewTaskForm({ setTasksData }) {
   const [value, setValue] = useState('')
+
+  const onAddTask = (name) => {
+    const taskName = name.trim()
+    if (!taskName) {
+      return
+    }
+    const newTask = createTask(name)
+
+    setTasksData((tasks) => [newTask, ...tasks])
+  }
 
   const onSubmit = (e) => {
     e.preventDefault()
@@ -24,7 +36,7 @@ function NewTaskForm({ onAddTask }) {
 }
 
 NewTaskForm.propTypes = {
-  onAddTask: PropTypes.func.isRequired,
+  setTasksData: PropTypes.func.isRequired,
 }
 
 export default NewTaskForm

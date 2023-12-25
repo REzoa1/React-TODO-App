@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react'
 import { intervalToDuration } from 'date-fns'
 import PropTypes from 'prop-types'
 
-function Timer({ id, initialSeconds, intervalId, isCompleted, isPaused, onSecondsSet }) {
+function Timer({ id, initialSeconds, intervalId, isPaused, isCompleted, onSecondsSet }) {
   const [seconds, setSeconds] = useState(initialSeconds)
   const currIntervalId = useRef()
 
@@ -40,13 +40,13 @@ function Timer({ id, initialSeconds, intervalId, isCompleted, isPaused, onSecond
       if (shouldTimerClear) {
         onSecondsSet(id, s)
       }
+
       if (shouldTimerUpdate && currIntervalId.current === null) {
         const newInterval = setInterval(() => {
           s += 1
           onSecondsSet(id, s, newInterval)
         }, 1000)
         onSecondsSet(id, s, newInterval)
-        currIntervalId.current = newInterval
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -64,8 +64,8 @@ Timer.propTypes = {
   id: PropTypes.number.isRequired,
   initialSeconds: PropTypes.number.isRequired,
   intervalId: PropTypes.number,
-  isCompleted: PropTypes.bool.isRequired,
   isPaused: PropTypes.bool.isRequired,
+  isCompleted: PropTypes.bool.isRequired,
   onSecondsSet: PropTypes.func.isRequired,
 }
 

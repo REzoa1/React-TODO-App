@@ -2,21 +2,10 @@ import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import { formatDistanceToNow } from 'date-fns'
 
-import { cn } from '../../utils/helpers'
+import { cn, updateTask } from '../../utils/helpers'
 import Timer from '../Timer/Timer'
 
-function Task({
-  id,
-  name,
-  created,
-  seconds,
-  intervalId,
-  isCompleted,
-  onToggleComplete,
-  onEditTask,
-  onDeleteTask,
-  onSecondsSet,
-}) {
+function Task({ id, name, created, seconds, intervalId, isCompleted, onEditTask, onSecondsSet, setTasksData }) {
   const initialTime = formatDistanceToNow(created)
   const hasTimer = seconds !== undefined ? intervalId === null : true
 
@@ -45,18 +34,22 @@ function Task({
   }
 
   const completeTask = () => {
-    onToggleComplete(id)
+    updateTask(setTasksData, id, ['isCompleted'])
     setIsPaused(true)
   }
 
   const editTask = () => {
     if (!isCompleted) {
-      onEditTask(id)
+      onEditTask()
     }
   }
 
   const deleteTask = () => {
-    onDeleteTask(id)
+    setTasksData((tasks) =>
+      tasks.map((task) => {
+        return task.id === id ? { id, shouldTimerClear: true } : task
+      })
+    )
   }
 
   const className = cn('icon', isCompleted && 'disable')
@@ -77,7 +70,6 @@ function Task({
             isPaused={isPaused}
             isCompleted={isCompleted}
             onSecondsSet={onSecondsSet}
-            onDeleteTask={onDeleteTask}
           />
         </span>
         <span className="description">created {time} ago</span>
@@ -95,10 +87,9 @@ Task.propTypes = {
   seconds: PropTypes.number,
   intervalId: PropTypes.number,
   isCompleted: PropTypes.bool,
-  onToggleComplete: PropTypes.func.isRequired,
   onEditTask: PropTypes.func.isRequired,
-  onDeleteTask: PropTypes.func.isRequired,
   onSecondsSet: PropTypes.func.isRequired,
+  setTasksData: PropTypes.func.isRequired,
 }
 
 Task.defaultProps = {

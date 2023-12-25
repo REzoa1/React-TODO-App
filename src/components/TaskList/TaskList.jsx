@@ -4,12 +4,12 @@ import PropTypes from 'prop-types'
 import Task from '../Task/Task'
 import EditTaskForm from '../EditTaskForm/EditTaskForm'
 import { taskTypes } from '../../utils/constants'
-import { cn } from '../../utils/helpers'
+import { cn, updateTask } from '../../utils/helpers'
 
 import { ReactComponent as NoDataLogo } from './noDataLogo.svg'
 import './TaskList.scss'
 
-function TaskList({ tasksData, filterName, onToggleComplete, onDeleteTask, onEditTask, onSecondsSet }) {
+function TaskList({ tasksData, filterName, setTasksData }) {
   const callback = ({ isCompleted }) => (filterName === 'Completed' ? isCompleted : !isCompleted)
   const tasks = filterName === 'All' ? tasksData : tasksData.filter(callback)
 
@@ -20,8 +20,20 @@ function TaskList({ tasksData, filterName, onToggleComplete, onDeleteTask, onEdi
     </div>
   )
 
+  const onSecondsSet = (id, seconds, intervalId = null) => {
+    updateTask(setTasksData, id, [
+      ['seconds', seconds],
+      ['intervalId', intervalId],
+    ])
+  }
+
   const elements = tasks.map(({ name, isCompleted, isEdited, id, created, seconds, intervalId }) => {
     const className = cn(isEdited && 'editing', isCompleted && 'completed')
+
+    const onEditTask = (newName) => {
+      updateTask(setTasksData, id, [['name', newName], 'isEdited'], 'edit')
+    }
+
     return (
       <li key={id} className={className}>
         <Task
@@ -31,13 +43,12 @@ function TaskList({ tasksData, filterName, onToggleComplete, onDeleteTask, onEdi
           seconds={seconds}
           intervalId={intervalId}
           isCompleted={isCompleted}
-          onToggleComplete={onToggleComplete}
           onEditTask={onEditTask}
-          onDeleteTask={onDeleteTask}
           onSecondsSet={onSecondsSet}
+          setTasksData={setTasksData}
         />
 
-        {isEdited && <EditTaskForm id={id} name={name} onEditTask={onEditTask} />}
+        {isEdited && <EditTaskForm name={name} onEditTask={onEditTask} />}
       </li>
     )
   })
@@ -48,10 +59,7 @@ function TaskList({ tasksData, filterName, onToggleComplete, onDeleteTask, onEdi
 TaskList.propTypes = {
   tasksData: PropTypes.arrayOf(taskTypes).isRequired,
   filterName: PropTypes.string,
-  onToggleComplete: PropTypes.func.isRequired,
-  onDeleteTask: PropTypes.func.isRequired,
-  onEditTask: PropTypes.func.isRequired,
-  onSecondsSet: PropTypes.func.isRequired,
+  setTasksData: PropTypes.func.isRequired,
 }
 
 TaskList.defaultProps = {

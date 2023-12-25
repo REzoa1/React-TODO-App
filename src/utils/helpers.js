@@ -38,4 +38,8 @@ const updateData = (currEl, props, actionType) => {
 
 const cn = (...classes) => [...classes].filter(Boolean).join(' ')
 
-export { createTask, updateData, cn }
+const updateTask = (setTasks, id, props, actionType) => {
+  setTasks((tasks) => tasks.map((task) => (task.id === id ? updateData(task, props, actionType) : task)))
+}
+
+export { createTask, cn, updateTask }
